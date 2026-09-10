@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuestra Historia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #faf7f5;
+      font-family: 'Montserrat', sans-serif;
+      padding: 24px 16px;
+      color: #2c2c2c;
+      overflow-x: hidden;
+      position: relative;
+      transition: background 1.2s ease;
+    }
+
+    body.white-screen {
+      background: #ffffff;
+    }
+
+    /* Capa global de fondo para los corazones */
+    .global-hearts-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .card {
+      background: #ffffff;
+      padding: 48px 32px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+      border: 1px solid #f0e6e0;
+      max-width: 440px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 18px;
+      position: relative;
+      z-index: 10;
+      transition: opacity 1s ease, transform 1s ease;
+    }
+
+    .card.hidden {
+      opacity: 0;
+      transform: scale(0.95);
+      pointer-events: none;
+    }
+
+    .subtitle-tag {
+      font-size: 0.72rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #a38f85;
+      font-weight: 500;
+    }
+
+    h1.title {
+      font-family: 'Cormorant Garamond', serif;
+      color: #1a1a1a;
+      font-size: 2.6rem;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+      margin-top: -6px;
+    }
+
+    .divider {
+      width: 40px;
+      height: 1px;
+      background-color: #c8b8b0;
+      margin: 2px 0 6px 0;
+    }
+
+    p.instruction {
+      color: #7a6e67;
+      font-size: 0.88rem;
+      font-weight: 300;
+      letter-spacing: 0.3px;
+    }
+
+    .action-button {
+      background: transparent;
+      border: 1px solid #d4c5bd;
+      color: #6b584f;
+      padding: 12px 28px;
+      border-radius: 30px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      outline: none;
+      margin: 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .action-button:hover {
+      background: #6b584f;
+      color: #ffffff;
+      border-color: #6b584f;
+      box-shadow: 0 4px 15px rgba(107, 88, 79, 0.15);
+    }
+
+    .action-button:active {
+      transform: scale(0.98);
+    }
+
+    .icon-symbol {
+      font-size: 0.85rem;
+    }
+
+    .photo-container {
+      width: 100%;
+      max-height: 0;
+      overflow: hidden;
+      border-radius: 8px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .photo-container.revealed {
+      max-height: 440px;
+      opacity: 1;
+      transform: translateY(0);
+      margin-top: 10px;
+    }
+
+    .photo-container img {
+      width: 100%;
+      height: 380px;
+      object-fit: cover;
+      display: block;
+      border-radius: 8px;
+      transition: opacity 0.4s ease;
+      filter: brightness(0.98) contrast(1.02);
+    }
+
+    .secret-message {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-style: italic;
+      color: #4a3e37;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.5s ease;
+      padding: 0 10px;
+      line-height: 1.35;
+    }
+
+    .secret-message.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .counter {
+      font-size: 0.75rem;
+      color: #9e8e85;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-top: -4px;
+    }
+
+    .fullscreen-love {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 1.5s ease;
+      background: #ffffff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .fullscreen-love.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .fullscreen-love h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.5rem;
+      font-weight: 600;
+      color: #2c221e;
+      letter-spacing: -0.5px;
+      animation: gentlePulse 3s infinite ease-in-out;
+    }
+
+    @keyframes gentlePulse {
+      0%, 100% { transform: scale(1); opacity: 0.95; }
+      50% { transform: scale(1.03); opacity: 1; }
+    }
+
+    /* Corazones flotantes al fondo general de la pantalla */
+    .bg-heart {
+      position: absolute;
+      bottom: -30px;
+      color: #e2cdc4;
+      font-size: 1.4rem;
+      pointer-events: none;
+      z-index: 1;
+      animation: floatFullBg 5s ease-out forwards;
+      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.03));
+    }
+
+    @keyframes floatFullBg {
+      0% {
+        transform: translateY(0) scale(0.6) rotate(-15deg);
+        opacity: 0;
+      }
+      20% {
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-105vh) scale(1.4) rotate(25deg);
+        opacity: 0;
+      }
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background-color: #d4b2a3;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      animation: floatParticle 5s linear forwards;
+      opacity: 0.5;
+    }
+
+    @keyframes floatParticle {
+      0% { transform: translateY(0) scale(0.8); opacity: 0; }
+      20% { opacity: 0.5; }
+      100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Contenedor general para corazones al fondo de toda la pantalla -->
+  <div class="global-hearts-bg" id="globalHeartsBg"></div>
+
+  <div class="card" id="mainCard">
+    <span class="subtitle-tag">Memorias & Momentos</span>
+    <h1 class="title">Nuestra Historia</h1>
+    <div class="divider"></div>
+    <p class="instruction" id="instructionText">Haz clic a continuación para comenzar el recorrido</p>
+
+    <button class="action-button" id="actionBtn" aria-label="Avanzar">
+      <span id="btnText">Descubrir</span>
+      <span class="icon-symbol">✦</span>
+    </button>
+
+    <div class="photo-container" id="photoContainer">
+      <img id="currentPhoto" src="" alt="Fotografía de recuerdo">
+    </div>
+
+    <p class="counter" id="photoCounter" style="display: none;"></p>
+    <p class="secret-message" id="secretMessage"></p>
+  </div>
+
+  <div class="fullscreen-love" id="finalScreen">
+    <h2>Te amo mi vida.</h2>
+  </div>
+
+  <script>
+    const photos = [
+      "IMG_9777.jpeg",
+      "IMG_9778.jpeg",
+      "IMG_9779.jpeg",
+      "IMG_9780.jpeg",
+      "IMG_9781.jpeg",
+      "IMG_9782.jpeg",
+      "IMG_9783.jpeg"
+    ];
+
+    const lovePhrases = [
+      "Cada instante compartido a tu lado adquiere un valor incalculable.",
+      "Tu presencia transforma los momentos cotidianos en recuerdos extraordinarios.",
+      "Gracias por ser mi paz, mi refugio y mi compañía constante.",
+      "En cada detalle tuyo encuentro una razón más para admirarte.",
+      "Construir nuestra historia juntos es el mayor privilegio.",
+      "Eres la coincidencia más hermosa e importante de mi vida.",
+      "Mi cariño por ti permanece firme hoy, mañana y siempre."
+    ];
+
+    let currentIndex = 0;
+    let isRevealed = false;
+    let heartInterval = null;
+
+    const actionBtn = document.getElementById('actionBtn');
+    const btnText = document.getElementById('btnText');
+    const photoContainer = document.getElementById('photoContainer');
+    const currentPhoto = document.getElementById('currentPhoto');
+    const secretMessage = document.getElementById('secretMessage');
+    const photoCounter = document.getElementById('photoCounter');
+    const instructionText = document.getElementById('instructionText');
+    const globalHeartsBg = document.getElementById('globalHeartsBg');
+    const mainCard = document.getElementById('mainCard');
+    const finalScreen = document.getElementById('finalScreen');
+
+    currentPhoto.src = photos[0];
+
+    setInterval(() => {
+      createParticle();
+    }, 1400);
+
+    actionBtn.addEventListener('click', () => {
+      if (!isRevealed) {
+        isRevealed = true;
+        photoContainer.classList.add('revealed');
+        secretMessage.textContent = lovePhrases[0];
+        secretMessage.classList.add('visible');
+        photoCounter.style.display = 'block';
+        photoCounter.textContent = `01 / 0${photos.length}`;
+        instructionText.textContent = "Haz clic para continuar";
+        btnText.textContent = "Siguiente";
+
+        createBgHeartBurst(6);
+        heartInterval = setInterval(() => {
+          createBgHeart();
+        }, 450);
+      } else {
+        currentIndex++;
+
+        if (currentIndex < photos.length) {
+          currentPhoto.style.opacity = '0.1';
+          secretMessage.classList.remove('visible');
+          createBgHeartBurst(4);
+
+          setTimeout(() => {
+            currentPhoto.src = photos[currentIndex];
+            secretMessage.textContent = lovePhrases[currentIndex];
+            currentPhoto.style.opacity = '1';
+            secretMessage.classList.add('visible');
+          }, 250);
+
+          photoCounter.textContent = `0${currentIndex + 1} / 0${photos.length}`;
+        } else {
+          clearInterval(heartInterval);
+          mainCard.classList.add('hidden');
+          document.body.classList.add('white-screen');
+
+          setTimeout(() => {
+            mainCard.style.display = 'none';
+            finalScreen.classList.add('active');
+          }, 1000);
+        }
+      }
+    });
+
+    function createBgHeartBurst(amount) {
+      for (let i = 0; i < amount; i++) {
+        setTimeout(() => {
+          createBgHeart();
+        }, i * 100);
+      }
+    }
+
+    function createBgHeart() {
+      const heartSymbols = ['♥', '♡', '❣'];
+      const heart = document.createElement('div');
+      heart.classList.add('bg-heart');
+      heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+      
+      heart.style.left = (Math.random() * 92 + 4) + 'vw';
+      heart.style.fontSize = (Math.random() * 0.8 + 1.1) + 'rem';
+      heart.style.animationDuration = (Math.random() * 2 + 4) + 's';
+
+      globalHeartsBg.appendChild(heart);
+
+      setTimeout(() => {
+        heart.remove();
+      }, 6000);
+    }
+
+    function createParticle() {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+      particle.style.left = Math.random() * 95 + 'vw';
+      
+      const size = (Math.random() * 3 + 2) + 'px';
+      particle.style.width = size;
+      particle.style.height = size;
+      particle.style.animationDuration = (Math.random() * 3 + 4) + 's';
+
+      document.body.appendChild(particle);
+
+      setTimeout(() => {
+        particle.remove();
+      }, 7000);
+    }
+  </script>
+
+</body>
+</html>
